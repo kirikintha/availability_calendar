@@ -1,0 +1,411 @@
+<?php
+/**
+ * Property Availability
+ * Adds a 12 month Calendar, and accepts data from the date module via AJAX
+ */
+
+define( "AVAILABILITY_CALENDAR_MODULE_PATH", drupal_get_path( 'module', 'availability_calendar' ) );
+
+//Include necessary Class(es)
+include_once( AVAILABILITY_CALENDAR_MODULE_PATH. '/inc/class.availabilityCalendar.inc' );
+
+/**
+ * Hook Init
+ */
+function availability_calendar_init() { //load js calendar listener
+  
+  drupal_add_js( AVAILABILITY_CALENDAR_MODULE_PATH. '/js/functions.availabilityCalendar.js','module','header');
+  
+}
+
+/**
+ * Hook Theme
+ */
+function availability_calendar_theme() {
+	
+	return array (
+    //Calendar Themes via tpl files.
+		'availability_calendar_calendar_month' => array (
+      'path'      => AVAILABILITY_CALENDAR_MODULE_PATH,
+      'template'  => 'theme/availability_calendar_calendar_month',
+			'arguments' => array( 'month_id' => NULL, 'month_name' => NULL, 'calendar' => NULL )
+		),
+		'availability_calendar_calendar_day' => array (
+      'path'      => AVAILABILITY_CALENDAR_MODULE_PATH,
+      'template'  => 'theme/availability_calendar_calendar_day',
+			'arguments' => array( 'day' => NULL )
+		),
+		'availability_calendar_calendar_default_format' => array (
+      'path'      => AVAILABILITY_CALENDAR_MODULE_PATH,
+      'template'  => 'theme/availability_calendar_calendar_default_format',
+			'arguments' => array( 'from_date' => NULL, 'to_date' => NULL, 'status' => NULL )
+		),
+    //CCK theme formatters.
+    'availability_calendar_formatter_default' => array(
+      'arguments' => array('element' => NULL),
+    ),
+    'availability_calendar' => array(
+      'arguments' => array('element' => NULL),
+    )
+	);
+	
+}
+
+/**
+ * Hook Block
+ */
+function availability_calendar_block( $op = 'list', $delta = 0, $edit = array() ) {
+  
+  switch ( $op ) {
+    
+    case 'list':
+      
+      $block['availability_calendar_calendar'] = array(
+        'info' => t('Availability Calendar: Calendar')
+      );
+      
+      return $block;
+    
+    case 'configure': //Nothing to see here?
+      
+      return $block;
+    
+    case 'view':
+    default:
+    
+      $block['subject'] = t('Availability Calendar');
+      $block['content'] = availabilityCalendar::_buildCalendar();
+    
+      return $block;
+    
+  }
+  
+}
+
+/**
+ * Hook Form Alter
+ */
+function availability_calendar_form_alter( &$form, &$form_state, $form_id ) {
+  
+  $fields = content_fields();
+  
+  foreach ( $fields as $field ) { //We need to find if we have any of our fields in the node-form
+    
+    if ( $field['type'] == 'availability_calendar' ) { //If we have a calendar date field
+      
+      $name                   = $field['field_name']; //get the name of the field
+      $form[$name]['#suffix'] = $form[$name]['#suffix'] .'<h2 class="title">Calendar Preview</h2>' .availabilityCalendar::_buildCalendar(); //add the calendar to the form
+      
+    }
+    
+  }
+  
+  return $form;
+  
+}
+
+/**
+ * Hook Node API
+ */
+function availability_calendar_nodeapi( &$node, $op, $a3 = NULL, $a4 = NULL ) {
+  
+  switch ( $op ) {
+    
+    case 'load':
+      
+      $fields = content_fields();
+      
+      foreach ( $fields as $field ) { //We need to find if we have any of our fields in the node-form
+        
+        if ( $field['type'] == 'availability_calendar' ) { //If we have a calendar date field
+          
+          $name  = $field['field_name']; //get the name of the field
+          
+          if ( !empty( $node->$name ) ) { //If this field is in this node we can build the js for this calendar
+            
+            //@todo I think that I also have to add a better ID to the calendar form, if we have multiple CCK widgets on the same form
+            $days = array();
+            foreach ( $node->$name as $key => $value ) { //I can't figure out a better way to do this here on the fly
+              
+              $newDays = availabilityCalendar::_getDaysInBetween( $value['from_date'], $value['to_date'], $value['status'] );
+              $days    = array_merge( $days, $newDays );
+              
+            }
+            
+            //Output everything into the proper Drupal.availabilityCalendar form
+            //krumo( $days );
+            availabilityCalendar::_buildCalendarJS( $days );
+            
+          }
+          
+        }
+        
+      }
+      
+    break;
+    
+  }
+  
+}
+
+//==========================================//
+// CONTENT FIELD WIDGET (CCK)
+//==========================================//
+
+/**
+ * Implementation of hook_field_info().
+ */
+function availability_calendar_field_info() {
+  
+  return array(
+    'availability_calendar' => array(
+      'label'       => t('Availability Calendar: Date Field'),
+      'description' => t('Stores a compound field that has a From Date, To Date and Status.')
+    )
+  );
+  
+}
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function availability_calendar_field_settings( $op, $field ) {
+  
+  switch ( $op ) {
+    
+    case 'database columns':
+      return array(
+        'from_date' => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE, 'sortable' => FALSE, 'views' => FALSE),
+        'to_date'   => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE, 'sortable' => FALSE, 'views' => FALSE),
+        'status'    => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE, 'sortable' => FALSE, 'views' => FALSE)
+      );
+
+  }
+  
+}
+
+/**
+ * Implementation of hook_content_is_empty().
+ */
+function availability_calendar_content_is_empty($item, $field) {
+  
+  if ( empty( $item['from_date'] ) || empty( $item['to_date'] ) || empty( $item['status'] ) ) {
+    
+    return TRUE;
+  
+  }
+  
+  return FALSE;
+
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function availability_calendar_field_formatter_info() {
+  
+  return array(
+    'default' => array(
+      'label'           => t('Default'),
+      'field types'     => array('availability_calendar'),
+      'multiple values' => CONTENT_HANDLE_CORE
+    )
+  );
+  
+}
+
+/**
+ * Theme function for 'default' example field formatter.
+ *
+ * $element['#item']: the sanitized $delta value for the item,
+ * $element['#field_name']: the field name,
+ * $element['#type_name']: the $node->type,
+ * $element['#formatter']: the $formatter_name,
+ * $element'#node']: the $node,
+ * $element['#delta']: the delta of this item, like '0',
+ *
+ */
+function theme_availability_calendar_formatter_default( $element ) {
+  
+  if ( !empty( $element['#item']['from_date'] ) && !empty( $element['#item']['to_date'] ) ) {
+    
+    return theme( 'availability_calendar_calendar_default_format',
+                 $element['#item']['from_date'],
+                 $element['#item']['to_date'],
+                 $element['#item']['status'] );
+    
+  }
+
+}
+
+/**
+ * FAPI theme for an individual element.
+ */
+function theme_availability_calendar( $element ) {
+  
+  $output = '<div class="availability-calendar-date-widget">';
+  $output .= theme( 'textfield', $element['from_date'] );
+  $output .= theme( 'textfield', $element['to_date'] );
+  $output .= theme( 'select', $element['status'] );
+  $output .= '</div>';
+  
+  return $output;
+
+}
+
+/**
+ * Implementation of FAPI hook_elements().
+ *
+ * Any FAPI callbacks needed for individual widgets can be declared here,
+ * and the element will be passed to those callbacks for processing.
+ *
+ * Drupal will automatically theme the element using a theme with
+ * the same name as the hook_elements key.
+ *
+ * Autocomplete_path is not used by text_widget but other widgets can use it
+ * (see nodereference and userreference).
+ */
+function availability_calendar_elements() {
+  
+  $elements = array(
+    'availability_calendar' => array(
+      '#input'   => TRUE,
+      '#process' => array('availability_calendar_process')
+    )
+  );
+  
+  return $elements;
+
+}
+
+/**
+ * Implementation of hook_widget_info().
+ *
+ * Here we indicate that the content module will handle
+ * the default value and multiple values for these widgets.
+ *
+ * Callbacks can be omitted if default handing is used.
+ * They're included here just so this module can be used
+ * as an example for custom modules that might do things
+ * differently.
+ */
+function availability_calendar_widget_info() {
+  
+  return array(
+    'availability_calendar' => array(
+      'label'           => 'Availability Calendar: Date Field',
+      'field types'     => array('availability_calendar'),
+      'multiple values' => CONTENT_HANDLE_CORE
+    )
+  );
+  
+}
+
+/**
+ * Implementation of hook_widget().
+ *
+ * Attach a single form element to the form. It will be built out and
+ * validated in the callback(s) listed in hook_elements. We build it
+ * out in the callbacks rather than here in hook_widget so it can be
+ * plugged into any module that can provide it with valid
+ * $field information.
+ *
+ * Content module will set the weight, field name and delta values
+ * for each form element. This is a change from earlier CCK versions
+ * where the widget managed its own multiple values.
+ *
+ * If there are multiple values for this field, the content module will
+ * call this function as many times as needed.
+ *
+ * @param $form
+ *   the entire form array, $form['#node'] holds node information
+ * @param $form_state
+ *   the form_state, $form_state['values'][$field['field_name']]
+ *   holds the field's form values.
+ * @param $field
+ *   the field array
+ * @param $items
+ *   array of default values for this field
+ * @param $delta
+ *   the order of this item in the array of subelements (0, 1, 2, etc)
+ *
+ * @return
+ *   the form item for a single element for this field
+ */
+function availability_calendar_widget( &$form, &$form_state, $field, $items, $delta = 0 ) {
+  
+  $element = array(
+    '#type'          => $field['widget']['type'],
+    '#default_value' => isset( $items[$delta] ) ? $items[$delta] : '',
+    '#title'         => $field['widget']['label'],
+    '#field'         => $field,
+  );
+  
+  return $element;
+
+}
+
+/**
+ * Process an individual element.
+ *
+ * Build the form element. When creating a form using FAPI #process,
+ * note that $element['#value'] is already set.
+ *
+ * The $fields array is in $form['#field_info'][$element['#field_name']].
+ */
+function availability_calendar_process( $element, $edit, $form_state, $form ) {
+  
+  //Load in necessary date_popup files
+  date_popup_load();
+  
+  //Form CSS
+  drupal_add_css( AVAILABILITY_CALENDAR_MODULE_PATH . '/css/form.css' );
+  
+  $settings = array(
+    'prevText'        => '&lt;'. date_t('Prev', 'date_nav'),
+    'nextText'        => date_t('Next', 'date_nav') .'&gt;',
+    'currentText'     => date_t('Today', 'date_nav'),
+    'clearText'       => t('Clear'),
+    'closeText'       => t('Close'),
+    'firstDay'        => intval(variable_get('date_first_day', 0)),
+    'dayNames'        => date_week_days(TRUE),
+    'dayNamesShort'   => date_week_days_abbr(TRUE, TRUE, 3),
+    'dayNamesMin'     => date_week_days_abbr(TRUE, TRUE, 2),
+    'monthNames'      => array_values(date_month_names(TRUE)),
+    'monthNamesShort' => array_values(date_month_names_abbr(TRUE)),
+    'autoPopUp'       => 'focus',
+    'closeAtTop'      => FALSE,
+    'speed'           => 'immediate',
+    'dateFormat'      => date_popup_format_to_popup('m/d/Y', 'datepicker'),
+    'yearRange'       => '-0:+0'
+  );  
+  
+  $element['from_date'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('From Date'),
+    '#maxlength'     => 12,
+    '#default_value' => isset( $element['#value']['from_date'] ) ? $element['#value']['from_date'] : NULL,
+    '#id'            => date_popup_js_settings_id( 0, 'datepicker', $settings )
+  );
+  
+  $element['to_date'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('To Date'),
+    '#maxlength'     => 12,
+    '#default_value' => isset( $element['#value']['to_date'] ) ? $element['#value']['to_date'] : NULL,
+    '#id'            => date_popup_js_settings_id( 1, 'datepicker', $settings )
+  );
+  
+  $element['status'] = array(
+    '#type'          => 'select',
+    '#title'         => t('Status'),
+    '#default_value' => isset( $element['#value']['status'] ) ? $element['#value']['status'] : 'unavailable',
+    '#options' => array(
+      'available'   => t('Available'),
+      'unavailable' => t('Unavailable')
+    )
+  );
+  
+  return $element;
+
+}

@@ -1,0 +1,26 @@
+/**
+ * Node Form CSS
+ */
+div.availability-calendar-widget .form-item {
+  float:left;
+  margin:0 20px;
+  width:120px !important;
+}
+
+div.availability-calendar-month {
+  margin:5px;
+  padding:10px 0 0 10px;
+  width:45%;
+  float:left;
+  font-size:.7em;
+  height:200px;
+  border: 1px solid #CCC;
+}
+
+div.availability-calendar-month td.unavailable {
+  background: #ff0000;
+}
+
+div.availability-calendar-month td.available {
+  background: #33CC33;
+}
