@@ -14,7 +14,7 @@ function _availability_notify() {
 /**
  * Implementation of hook_install.
  */
-function availability_calendary_install() {
+function availability_calendar_install() {
   
   _availability_notify();
   
@@ -25,7 +25,7 @@ function availability_calendary_install() {
 /**
  * Implementation of hook_uninstall.
  */
-function availability_calendary_uninstall() {
+function availability_calendar_uninstall() {
   
   _availability_notify();
   
@@ -36,7 +36,7 @@ function availability_calendary_uninstall() {
 /**
  * Implementation of hook_enable.
  */
-function availability_calendary_enable() {
+function availability_calendar_enable() {
   
   _availability_notify();
   
@@ -47,7 +47,7 @@ function availability_calendary_enable() {
 /**
  * Implementation of hook_disable.
  */
-function availability_calendary_disable() {
+function availability_calendar_disable() {
   
   _availability_notify();
   
