@@ -1,7 +1,7 @@
 /**
  * Node Form CSS
  */
-div.availability-calendar-widget .form-item {
+div.availability-calendar-date-widget .form-item {
   float:left;
   margin:0 20px;
   width:120px !important;
