@@ -1,12 +1,27 @@
 /**
  * Node Form CSS
  */
-div.availability-calendar-date-widget .form-item {
+form#node-form div.availability-calendar-date-widget .form-item {
+  margin:0 0 0 10px;
   float:left;
-  margin:0 20px;
-  width:120px !important;
 }
 
+form#node-form div.availability-calendar-date-widget label {
+  font-size:10px;
+}
+
+form#node-form input.availability-calendar-date-field-from,
+form#node-form input.availability-calendar-date-field-to {
+  width:100px !important;
+}
+
+form#node-form input.availability-calendar-status-field {
+  max-width:200px !important;
+}
+
+/**
+ * Calendar CSS
+ */
 div.availability-calendar-month {
   margin:5px;
   padding:10px 0 0 10px;

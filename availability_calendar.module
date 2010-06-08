@@ -385,7 +385,8 @@ function availability_calendar_process( $element, $edit, $form_state, $form ) {
     '#title'         => t('From Date'),
     '#maxlength'     => 12,
     '#default_value' => isset( $element['#value']['from_date'] ) ? $element['#value']['from_date'] : NULL,
-    '#id'            => date_popup_js_settings_id( 0, 'datepicker', $settings )
+    '#id'            => date_popup_js_settings_id( 0, 'datepicker', $settings ),
+    '#attributes'    => array( 'class' => 'availability-calendar-date-field-from' )
   );
   
   $element['to_date'] = array(
@@ -393,7 +394,8 @@ function availability_calendar_process( $element, $edit, $form_state, $form ) {
     '#title'         => t('To Date'),
     '#maxlength'     => 12,
     '#default_value' => isset( $element['#value']['to_date'] ) ? $element['#value']['to_date'] : NULL,
-    '#id'            => date_popup_js_settings_id( 1, 'datepicker', $settings )
+    '#id'            => date_popup_js_settings_id( 1, 'datepicker', $settings ),
+    '#attributes'    => array( 'class' => 'availability-calendar-date-field-to' )
   );
   
   $element['status'] = array(
@@ -403,7 +405,8 @@ function availability_calendar_process( $element, $edit, $form_state, $form ) {
     '#options' => array(
       'available'   => t('Available'),
       'unavailable' => t('Unavailable')
-    )
+    ),
+    '#attributes'   => array( 'class' => 'availability-calendar-status-field' )
   );
   
   return $element;

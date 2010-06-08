@@ -34,7 +34,7 @@ if (Drupal.jsEnabled) {
       } );
       
       //When we blur the field, we need to recalculate the preview
-      $('div.availability-calendar-date-widget input.form-text').bind( 'change', function () {
+      $('div.availability-calendar-date-widget input.availability-calendar-date-field-from, div.availability-calendar-date-widget input.availability-calendar-date-field-to, ').bind( 'change', function () {
         
         //We have to sanity check here, that this date does not conflict with it's corresponding to/from date
         
