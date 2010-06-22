@@ -132,6 +132,9 @@ function availability_calendar_nodeapi( &$node, $op, $a3 = NULL, $a4 = NULL ) {
               
             }
             
+            //Load JS Files
+            availability_calendar_load_js();
+            
             //Output everything into the proper Drupal.availabilityCalendar form
             //krumo( $days );
             availabilityCalendar::_buildCalendarJS( $days );
