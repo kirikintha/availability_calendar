@@ -12,7 +12,7 @@ include_once( AVAILABILITY_CALENDAR_MODULE_PATH. '/inc/class.availabilityCalenda
 /**
  * Hook Init
  */
-function availability_calendar_init() { //load js calendar listener
+function availability_calendar_load_js() { //load js calendar listener
   
   drupal_add_js( AVAILABILITY_CALENDAR_MODULE_PATH. '/js/functions.availabilityCalendar.js','module','header');
   
@@ -357,6 +357,9 @@ function availability_calendar_process( $element, $edit, $form_state, $form ) {
   
   //Load in necessary date_popup files
   date_popup_load();
+  
+  //Load JS Files
+  availability_calendar_load_js();
   
   //Form CSS
   drupal_add_css( AVAILABILITY_CALENDAR_MODULE_PATH . '/css/form.css' );
