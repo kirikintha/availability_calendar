@@ -4,10 +4,10 @@
  * @name _availability_notify()
  * Common function for notifying the content module of this module's existence
  */
-function _availability_notify( $op ) {
+function _availability_notify($op) {
   
-  drupal_load( 'module', 'content' );
-  content_notify( $op, 'availability_calendar' );
+  drupal_load('module', 'content');
+  content_notify($op, 'availability_calendar');
   
 }
 
@@ -16,9 +16,9 @@ function _availability_notify( $op ) {
  */
 function availability_calendar_install() {
   
-  _availability_notify( 'install' );
+  _availability_notify('install');
   
-  drupal_set_message( t('Availability Calendar Module has installed successfully. Please see README.txt for more information on this module.') );
+  drupal_set_message(t('Availability Calendar Module has installed successfully. Please see README.txt for more information on this module.'));
   
 }
 
@@ -27,9 +27,9 @@ function availability_calendar_install() {
  */
 function availability_calendar_uninstall() {
   
-  _availability_notify( 'uninstall' );
+  _availability_notify('uninstall');
   
-  drupal_set_message( t('Availability Calendar Module uninstalled successfully. You have not deleted any availability content, this has to be performed on your own.') );
+  drupal_set_message(t('Availability Calendar Module uninstalled successfully. You have not deleted any availability content, this has to be performed on your own.'));
   
 }
 
@@ -38,9 +38,9 @@ function availability_calendar_uninstall() {
  */
 function availability_calendar_enable() {
   
-  _availability_notify( 'enable' );
+  _availability_notify('enable');
   
-  drupal_set_message( t('Availability Calendar Module has been enabled successfully.') );
+  drupal_set_message(t('Availability Calendar Module has been enabled successfully.'));
   
 }
 
@@ -49,8 +49,8 @@ function availability_calendar_enable() {
  */
 function availability_calendar_disable() {
   
-  _availability_notify( 'disable' );
+  _availability_notify('disable');
   
-  drupal_set_message( t('Availability Calendar Module has been disabled successfully.') );
+  drupal_set_message(t('Availability Calendar Module has been disabled successfully.'));
   
 }

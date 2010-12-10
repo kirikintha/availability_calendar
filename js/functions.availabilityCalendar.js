@@ -108,18 +108,27 @@ if (Drupal.jsEnabled) {
         
         for ( var i = 0; i <= daysApart; i++ ) {
           
+          var midDay = '';
+          
+          if ( i == 0 || i == daysApart ) { //make sure we add the mid-day-first class where necessary
+            midDay = ' mid-day-first';
+          }
+          
+          if ( i == daysApart ) { //make sure we add the mid-day-last class where necessary
+            midDay = ' mid-day-last';
+          }
+          
           newDate = new Date( startDate );
           newDate.setDate( startDate.getDate() + i );
           //Drupal.trace( newDate );
           newDate = ( newDate.getMonth() + 1 ) + "-" + newDate.getDate() + "-" + newDate.getFullYear(); //We have to get the month + 1 because it is a zero array, and the rest of the date stuff is fine
           //Drupal.trace( newDate );
-          Drupal.availabilityCalendar[newDate] = status; //Add the new dates to the propertyAvailability Array, and then send off the changes to updateCalendar
+          Drupal.availabilityCalendar[newDate] = status + midDay; //Add the new dates to the propertyAvailability Array, and then send off the changes to updateCalendar
           
         }
         
       }
       
-      //Drupal.trace( Drupal.availabilityCalendar );
       _updateCalendar(); //After we have everything reset, update that Caendar!
       
     }

@@ -4,17 +4,17 @@
  * Adds a 12 month Calendar, and accepts data from the date module via AJAX
  */
 
-define( "AVAILABILITY_CALENDAR_MODULE_PATH", drupal_get_path( 'module', 'availability_calendar' ) );
+define("AVAILABILITY_CALENDAR_MODULE_PATH", drupal_get_path('module', 'availability_calendar'));
 
 //Include necessary Class(es)
-include_once( AVAILABILITY_CALENDAR_MODULE_PATH. '/inc/class.availabilityCalendar.inc' );
+include_once(AVAILABILITY_CALENDAR_MODULE_PATH. '/inc/class.availabilityCalendar.inc');
 
 /**
  * Hook Init
  */
 function availability_calendar_load_js() { //load js calendar listener
   
-  drupal_add_js( AVAILABILITY_CALENDAR_MODULE_PATH. '/js/functions.availabilityCalendar.js','module','header');
+  drupal_add_js(AVAILABILITY_CALENDAR_MODULE_PATH. '/js/functions.availabilityCalendar.js','module','header');
   
 }
 
@@ -28,25 +28,25 @@ function availability_calendar_theme() {
 		'availability_calendar_calendar_month' => array (
       'path'      => AVAILABILITY_CALENDAR_MODULE_PATH,
       'template'  => 'theme/availability_calendar_calendar_month',
-			'arguments' => array( 'month_id' => NULL, 'month_name' => NULL, 'calendar' => NULL )
+			'arguments' => array('month_id' => NULL, 'month_name' => NULL, 'calendar' => NULL)
 		),
 		'availability_calendar_calendar_day' => array (
       'path'      => AVAILABILITY_CALENDAR_MODULE_PATH,
       'template'  => 'theme/availability_calendar_calendar_day',
-			'arguments' => array( 'day' => NULL )
+			'arguments' => array('day' => NULL)
 		),
 		'availability_calendar_calendar_default_format' => array (
       'path'      => AVAILABILITY_CALENDAR_MODULE_PATH,
       'template'  => 'theme/availability_calendar_calendar_default_format',
-			'arguments' => array( 'from_date' => NULL, 'to_date' => NULL, 'status' => NULL )
+			'arguments' => array('from_date' => NULL, 'to_date' => NULL, 'status' => NULL)
 		),
     //CCK theme formatters.
     'availability_calendar_formatter_default' => array(
       'arguments' => array('element' => NULL),
-    ),
+   ),
     'availability_calendar' => array(
       'arguments' => array('element' => NULL),
-    )
+   )
 	);
 	
 }
@@ -54,15 +54,15 @@ function availability_calendar_theme() {
 /**
  * Hook Block
  */
-function availability_calendar_block( $op = 'list', $delta = 0, $edit = array() ) {
+function availability_calendar_block($op = 'list', $delta = 0, $edit = array()) {
   
-  switch ( $op ) {
+  switch ($op) {
     
     case 'list':
       
       $block['availability_calendar_calendar'] = array(
         'info' => t('Availability Calendar: Calendar')
-      );
+     );
       
       return $block;
     
@@ -85,13 +85,13 @@ function availability_calendar_block( $op = 'list', $delta = 0, $edit = array() 
 /**
  * Hook Form Alter
  */
-function availability_calendar_form_alter( &$form, &$form_state, $form_id ) {
+function availability_calendar_form_alter(&$form, &$form_state, $form_id) {
   
   $fields = content_fields();
   
-  foreach ( $fields as $field ) { //We need to find if we have any of our fields in the node-form
+  foreach ($fields as $field) { //We need to find if we have any of our fields in the node-form
     
-    if ( $field['type'] == 'availability_calendar' ) { //If we have a calendar date field
+    if ($field['type'] == 'availability_calendar') { //If we have a calendar date field
       
       $name                   = $field['field_name']; //get the name of the field
       $form[$name]['#suffix'] = $form[$name]['#suffix'] .'<h2 class="title">Calendar Preview</h2>' .availabilityCalendar::_buildCalendar(); //add the calendar to the form
@@ -107,28 +107,28 @@ function availability_calendar_form_alter( &$form, &$form_state, $form_id ) {
 /**
  * Hook Node API
  */
-function availability_calendar_nodeapi( &$node, $op, $a3 = NULL, $a4 = NULL ) {
+function availability_calendar_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
   
-  switch ( $op ) {
+  switch ($op) {
     
     case 'load':
       
       $fields = content_fields();
       
-      foreach ( $fields as $field ) { //We need to find if we have any of our fields in the node-form
+      foreach ($fields as $field) { //We need to find if we have any of our fields in the node-form
         
-        if ( $field['type'] == 'availability_calendar' ) { //If we have a calendar date field
+        if ($field['type'] == 'availability_calendar') { //If we have a calendar date field
           
           $name  = $field['field_name']; //get the name of the field
           
-          if ( !empty( $node->$name ) ) { //If this field is in this node we can build the js for this calendar
+          if (!empty($node->$name)) { //If this field is in this node we can build the js for this calendar
             
             //@todo I think that I also have to add a better ID to the calendar form, if we have multiple CCK widgets on the same form
             $days = array();
-            foreach ( $node->$name as $key => $value ) { //I can't figure out a better way to do this here on the fly
+            foreach ($node->$name as $key => $value) { //I can't figure out a better way to do this here on the fly
               
-              $newDays = availabilityCalendar::_getDaysInBetween( $value['from_date'], $value['to_date'], $value['status'] );
-              $days    = array_merge( $days, $newDays );
+              $newDays = availabilityCalendar::_getDaysInBetween($value['from_date'], $value['to_date'], $value['status']);
+              $days    = array_merge($days, $newDays);
               
             }
             
@@ -136,8 +136,8 @@ function availability_calendar_nodeapi( &$node, $op, $a3 = NULL, $a4 = NULL ) {
             availability_calendar_load_js();
             
             //Output everything into the proper Drupal.availabilityCalendar form
-            //krumo( $days );
-            availabilityCalendar::_buildCalendarJS( $days );
+            //krumo($days);
+            availabilityCalendar::_buildCalendarJS($days);
             
           }
           
@@ -164,24 +164,24 @@ function availability_calendar_field_info() {
     'availability_calendar' => array(
       'label'       => t('Availability Calendar: Date Field'),
       'description' => t('Stores a compound field that has a From Date, To Date and Status.')
-    )
-  );
+   )
+ );
   
 }
 
 /**
  * Implementation of hook_field_settings().
  */
-function availability_calendar_field_settings( $op, $field ) {
+function availability_calendar_field_settings($op, $field) {
   
-  switch ( $op ) {
+  switch ($op) {
     
     case 'database columns':
       return array(
         'from_date' => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE, 'sortable' => FALSE, 'views' => FALSE),
         'to_date'   => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE, 'sortable' => FALSE, 'views' => FALSE),
         'status'    => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE, 'sortable' => FALSE, 'views' => FALSE)
-      );
+     );
 
   }
   
@@ -192,7 +192,7 @@ function availability_calendar_field_settings( $op, $field ) {
  */
 function availability_calendar_content_is_empty($item, $field) {
   
-  if ( empty( $item['from_date'] ) || empty( $item['to_date'] ) || empty( $item['status'] ) ) {
+  if (empty($item['from_date']) || empty($item['to_date']) || empty($item['status'])) {
     
     return TRUE;
   
@@ -212,8 +212,8 @@ function availability_calendar_field_formatter_info() {
       'label'           => t('Default'),
       'field types'     => array('availability_calendar'),
       'multiple values' => CONTENT_HANDLE_CORE
-    )
-  );
+   )
+ );
   
 }
 
@@ -228,14 +228,14 @@ function availability_calendar_field_formatter_info() {
  * $element['#delta']: the delta of this item, like '0',
  *
  */
-function theme_availability_calendar_formatter_default( $element ) {
+function theme_availability_calendar_formatter_default($element) {
   
-  if ( !empty( $element['#item']['from_date'] ) && !empty( $element['#item']['to_date'] ) ) {
+  if (!empty($element['#item']['from_date']) && !empty($element['#item']['to_date'])) {
     
-    return theme( 'availability_calendar_calendar_default_format',
+    return theme('availability_calendar_calendar_default_format',
                  $element['#item']['from_date'],
                  $element['#item']['to_date'],
-                 $element['#item']['status'] );
+                 $element['#item']['status']);
     
   }
 
@@ -244,12 +244,12 @@ function theme_availability_calendar_formatter_default( $element ) {
 /**
  * FAPI theme for an individual element.
  */
-function theme_availability_calendar( $element ) {
+function theme_availability_calendar($element) {
   
   $output = '<div class="availability-calendar-date-widget">';
-  $output .= theme( 'textfield', $element['from_date'] );
-  $output .= theme( 'textfield', $element['to_date'] );
-  $output .= theme( 'select', $element['status'] );
+  $output .= theme('textfield', $element['from_date']);
+  $output .= theme('textfield', $element['to_date']);
+  $output .= theme('select', $element['status']);
   $output .= '</div>';
   
   return $output;
@@ -274,8 +274,8 @@ function availability_calendar_elements() {
     'availability_calendar' => array(
       '#input'   => TRUE,
       '#process' => array('availability_calendar_process')
-    )
-  );
+   )
+ );
   
   return $elements;
 
@@ -299,8 +299,8 @@ function availability_calendar_widget_info() {
       'label'           => 'Availability Calendar: Date Field',
       'field types'     => array('availability_calendar'),
       'multiple values' => CONTENT_HANDLE_CORE
-    )
-  );
+   )
+ );
   
 }
 
@@ -335,14 +335,14 @@ function availability_calendar_widget_info() {
  * @return
  *   the form item for a single element for this field
  */
-function availability_calendar_widget( &$form, &$form_state, $field, $items, $delta = 0 ) {
+function availability_calendar_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   
   $element = array(
     '#type'          => $field['widget']['type'],
-    '#default_value' => isset( $items[$delta] ) ? $items[$delta] : '',
+    '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
     '#title'         => $field['widget']['label'],
     '#field'         => $field,
-  );
+ );
   
   return $element;
 
@@ -356,7 +356,7 @@ function availability_calendar_widget( &$form, &$form_state, $field, $items, $de
  *
  * The $fields array is in $form['#field_info'][$element['#field_name']].
  */
-function availability_calendar_process( $element, $edit, $form_state, $form ) {
+function availability_calendar_process($element, $edit, $form_state, $form) {
   
   //Load in necessary date_popup files
   date_popup_load();
@@ -365,7 +365,7 @@ function availability_calendar_process( $element, $edit, $form_state, $form ) {
   availability_calendar_load_js();
   
   //Form CSS
-  drupal_add_css( AVAILABILITY_CALENDAR_MODULE_PATH . '/css/form.css' );
+  drupal_add_css(AVAILABILITY_CALENDAR_MODULE_PATH . '/css/form.css');
   
   $settings = array(
     'prevText'        => '&lt;'. date_t('Prev', 'date_nav'),
@@ -383,37 +383,37 @@ function availability_calendar_process( $element, $edit, $form_state, $form ) {
     'closeAtTop'      => FALSE,
     'speed'           => 'immediate',
     'dateFormat'      => date_popup_format_to_popup('m/d/Y', 'datepicker'),
-    'yearRange'       => '-0:+0'
-  );  
+    'yearRange'       => '-0:+1'
+ );
   
   $element['from_date'] = array(
     '#type'          => 'textfield',
     '#title'         => t('From Date'),
     '#maxlength'     => 12,
-    '#default_value' => isset( $element['#value']['from_date'] ) ? $element['#value']['from_date'] : NULL,
-    '#id'            => date_popup_js_settings_id( 0, 'datepicker', $settings ),
-    '#attributes'    => array( 'class' => 'availability-calendar-date-field-from' )
-  );
+    '#default_value' => isset($element['#value']['from_date']) ? $element['#value']['from_date'] : NULL,
+    '#id'            => date_popup_js_settings_id(0, 'datepicker', $settings),
+    '#attributes'    => array('class' => 'availability-calendar-date-field-from')
+ );
   
   $element['to_date'] = array(
     '#type'          => 'textfield',
     '#title'         => t('To Date'),
     '#maxlength'     => 12,
-    '#default_value' => isset( $element['#value']['to_date'] ) ? $element['#value']['to_date'] : NULL,
-    '#id'            => date_popup_js_settings_id( 1, 'datepicker', $settings ),
-    '#attributes'    => array( 'class' => 'availability-calendar-date-field-to' )
-  );
+    '#default_value' => isset($element['#value']['to_date']) ? $element['#value']['to_date'] : NULL,
+    '#id'            => date_popup_js_settings_id(1, 'datepicker', $settings),
+    '#attributes'    => array('class' => 'availability-calendar-date-field-to')
+ );
   
   $element['status'] = array(
     '#type'          => 'select',
     '#title'         => t('Status'),
-    '#default_value' => isset( $element['#value']['status'] ) ? $element['#value']['status'] : 'unavailable',
+    '#default_value' => isset($element['#value']['status']) ? $element['#value']['status'] : 'unavailable',
     '#options' => array(
       'available'   => t('Available'),
       'unavailable' => t('Unavailable')
-    ),
-    '#attributes'   => array( 'class' => 'availability-calendar-status-field' )
-  );
+   ),
+    '#attributes'   => array('class' => 'availability-calendar-status-field')
+ );
   
   return $element;
 
