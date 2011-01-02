@@ -2,55 +2,41 @@
 
 /**
  * @name _availability_notify()
- * Common function for notifying the content module of this module's existence
+ *  Common function for notifying the content module of this module's existence.
  */
 function _availability_notify($op) {
-  
   drupal_load('module', 'content');
   content_notify($op, 'availability_calendar');
-  
 }
 
 /**
- * Implementation of hook_install.
+ * Implementation of hook_install().
  */
 function availability_calendar_install() {
-  
   _availability_notify('install');
-  
   drupal_set_message(t('Availability Calendar Module has installed successfully. Please see README.txt for more information on this module.'));
-  
 }
 
 /**
- * Implementation of hook_uninstall.
+ * Implementation of hook_uninstall().
  */
 function availability_calendar_uninstall() {
-  
   _availability_notify('uninstall');
-  
   drupal_set_message(t('Availability Calendar Module uninstalled successfully. You have not deleted any availability content, this has to be performed on your own.'));
-  
 }
 
 /**
- * Implementation of hook_enable.
+ * Implementation of hook_enable().
  */
 function availability_calendar_enable() {
-  
   _availability_notify('enable');
-  
   drupal_set_message(t('Availability Calendar Module has been enabled successfully.'));
-  
 }
 
 /**
- * Implementation of hook_disable.
+ * Implementation of hook_disable().
  */
 function availability_calendar_disable() {
-  
   _availability_notify('disable');
-  
   drupal_set_message(t('Availability Calendar Module has been disabled successfully.'));
-  
 }

@@ -6,7 +6,5 @@
  */
 ?>
 <div class="availability-calendar-default-format" >
-  
-	<?php print $from_date; ?> - <?php print $to_date; ?> : <?php print $status; ?>
-	
+  <?php print $from_date; ?> - <?php print $to_date; ?> : <?php print $status; ?>
 </div>

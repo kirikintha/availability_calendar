@@ -1,6 +1,6 @@
 name           = Availability Calendar
-description    = Allows Users To create Flexible Availability Calendars with a CCK Widget.
-version        = 2.0
+description    = Allows Users To create Flexible Availability Calendars with a CCK Widget and a corresponding Availability Calendar Block.
+version        = 6.x-beta2
 dependencies[] = content
 dependencies[] = date_popup
 package        = CCK

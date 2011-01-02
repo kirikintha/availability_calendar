@@ -29,22 +29,32 @@ NOTE: This will NEVER be legacy ported to Drupal 5, I am truly sorry, but I don'
 
 3. Only ONE (1) CCK Field should be applied to a content type at one time. There will be problems if you try and put many fields on one content type.
 
+4. Displays only (1) calendar per node, or page. No support for multiple calendars yet, sorry.
+
+5. Displays a Gregorian Calendar only.
+
 ##Dependencies
 
-Content Module
+Content Module (CCK)
 Date Popup
 Jquery 1.2.6
 
 ##Road Map
 
-1. Work through integration with the calendar module, if at all possible
+1. Allow multiple calendars to render on the page at the same time.
 
-2. Allow multiple calendars to render on the page at the same time.
+2. Better Validation for incorrect user actions, and a backup server side _validate for bad date ranges, in case something gets past the javascript.
 
-3. Better Validation for incorrect user actions, and a backup server side _validate for bad date ranges, in case something gets past the javascript.
+3. Choose what date popup to use, or add your own.
+
+4. Change the way the theming works, so we can have a pattern to match.
+
+5. Make the CCK widget have more configuration options.
+
+6. Make the block have configuration options, if needed.
 
 ##Contacting the Maintainer of This project
 
-Please feel free to contact me via github or drupal.org. My handle is "kirikintha" it's easy to find me. Support requests should allow between 3-5 business days, and I have to reserve the right to push off new features to the next version. My plan is to have quarterly releases, unless there is an emergency bug that crashes everything, which I will do my best to resolve as quickly as I can.
+Please feel free to contact me via github or drupal.org. My handle is "kirikintha" it's easy to find me. Support requests should allow between 3-5 business days to reply, and I have to reserve the right to push off new features to the next version. My plan is to have quarterly releases, unless there is an emergency bug that crashes everything, which I will do my best to resolve as quickly as I can.
 
 Thank you very much for using my module, I hope it works for you bug free!
