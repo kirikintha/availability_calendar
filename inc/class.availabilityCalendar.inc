@@ -161,7 +161,7 @@ class availabilityCalendarCalendar {
       
       if (!empty($rows)) { //This is definitely the point I would like to allow for a better intercept of the table
         
-        $calendar = theme_table($headers, $rows, array('id' => $month['month_id'], 'class' => 'availability-calendar')); // our final table
+        $calendar = theme('table', $headers, $rows, array('id' => $month['month_id'], 'class' => 'availability-calendar')); // our final table
         $data     .= theme('availability_calendar_calendar_month', $month['month_id'], $month['month_full_name'], $calendar);
         
       }
@@ -177,11 +177,11 @@ class availabilityCalendarCalendar {
     $months = array();
     
     foreach ($this->months as $month => $time) { //get all months into their proper array positions here!
-      
-      $months[$time]['total_days']      = date("t", mktime(0, 0, 0, $month, 1, $this->year));//total days
-      $months[$time]['day_offest']      = date("w", mktime(0, 0, 0, $month, 1, $this->year));//What day of the week does this month start?
-      $months[$time]['month_id']        = strtolower(date("M", mktime(0, 0, 0, $month, 1, $this->year))); //make the common short three letter name the id
-      $months[$time]['month_full_name'] = ucwords(date("F", mktime(0, 0, 0, $month, 1, $this->year))); //full name, for labels and such
+      $year = date('Y', $time);
+      $months[$time]['total_days']      = date("t", mktime(0, 0, 0, $month, 1, $year));//total days
+      $months[$time]['day_offest']      = date("w", mktime(0, 0, 0, $month, 1, $year));//What day of the week does this month start?
+      $months[$time]['month_id']        = strtolower(date("M", mktime(0, 0, 0, $month, 1, $year))); //make the common short three letter name the id
+      $months[$time]['month_full_name'] = ucwords(date("F Y", mktime(0, 0, 0, $month, 1, $year))); //full name, for labels and such
       
       $data = array();
       
