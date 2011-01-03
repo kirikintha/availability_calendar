@@ -19,21 +19,27 @@ module_load_include('inc', 'availability_calendar', 'includes/class.availability
  * Implementation of hook_theme().
  */
 function availability_calendar_theme() {
+  //Initiate the theme array and set the theme elements.
+  $theme = array();
+  $path  = AVAILABILITY_CALENDAR_MODULE_PATH .'/theme';
   return array (
     //Calendar Themes via tpl files.
     'availability_calendar_calendar_month' => array (
-      'path'      => AVAILABILITY_CALENDAR_MODULE_PATH,
-      'template'  => 'theme/availability_calendar_calendar_month',
+      'file'      => 'theme.availability_calendar.inc',
+      'path'      => $path,
+      'template'  => 'availability-calendar-calendar-month',
       'arguments' => array('month_id' => NULL, 'month_name' => NULL, 'calendar' => NULL),
     ),
     'availability_calendar_calendar_day' => array (
-      'path'      => AVAILABILITY_CALENDAR_MODULE_PATH,
-      'template'  => 'theme/availability_calendar_calendar_day',
+      'file'      => 'theme.availability_calendar.inc',
+      'path'      => $path,
+      'template'  => 'availability-calendar-calendar-day',
       'arguments' => array('day' => NULL),
     ),
-    'availability_calendar_calendar_default_format' => array (
-      'path'      => AVAILABILITY_CALENDAR_MODULE_PATH,
-      'template'  => 'theme/availability_calendar_calendar_default_format',
+    'availability_calendar_calendar' => array (
+      'file'      => 'theme.availability_calendar.inc',
+      'path'      => $path,
+      'template'  => 'availability-calendar-calendar',
       'arguments' => array('from_date' => NULL, 'to_date' => NULL, 'status' => NULL),
     ),
     //CCK theme formatters.
@@ -56,11 +62,10 @@ function availability_calendar_block($op = 'list', $delta = 0, $edit = array()) 
       //List our calendar in the block list.
       //@todo - this could be a little more intelligent, like knowing if there is a CCK widget, so we can support multiple calendars.
       $block['availability_calendar_calendar'] = array(
-      'info' => t('Availability Calendar: Calendar')
+        'info'       => t('Availability Calendar: Calendar'),
+        'visibility' => 2,
+        'pages'      => "admin*\nnode/*/*",
       );
-      return $block;
-    case 'configure':
-      //@todo - change this so that each individual block can be configured with their own customizable options, like show the whole calendar for only this year, follow the month, etc.
       return $block;
     case 'view':
       //Build our calendar object.
@@ -80,11 +85,11 @@ function availability_calendar_form_alter(&$form, &$form_state, $form_id) {
   //We need to find if we have any of our fields in the node-form.
   foreach ($fields as $field) {
     //If we have a calendar date field.
-    if ($field['type'] == 'availability_calendar') { 
+    if ($field['type'] == 'availability_calendar') {
       //Get the name of the field.
-      $name                   = $field['field_name'];
+      $name = $field['field_name'];
       //Add the live calendar to the form.
-      $form[$name]['#suffix'] = $form[$name]['#suffix'] .'<h2 class="title">Calendar Preview</h2>' .availabilityCalendar::_buildCalendar();
+      $form[$name]['#suffix'] = $form[$name]['#suffix'] .'<div id="'.$name.'" class="availability-calendar-preview"><h2 class="title">Calendar Preview</h2>' .availabilityCalendar::_buildCalendar() .'</div>';
     }
   }
 }
@@ -114,7 +119,9 @@ function availability_calendar_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
               $days    = array_merge($days, $newDays);
             }
             //Load javascript.
-            availability_calendar_load_js();
+            availabilityCalendar::_loadJS();
+            //Form CSS
+            drupal_add_css(AVAILABILITY_CALENDAR_MODULE_PATH . '/css/availability-calendar-styles.css');
             //Output everything into the Drupal.settings.availabilityCalendar
             availabilityCalendar::_buildCalendarJS($days);
           }
@@ -127,6 +134,37 @@ function availability_calendar_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 //==========================================//
 // CONTENT FIELD WIDGET (CCK)
 //==========================================//
+
+
+/**
+ * Theme function for 'default' example field formatter.
+ *
+ * $element['#item']: the sanitized $delta value for the item,
+ * $element['#field_name']: the field name,
+ * $element['#type_name']: the $node->type,
+ * $element['#formatter']: the $formatter_name,
+ * $element'#node']: the $node,
+ * $element['#delta']: the delta of this item, like '0',
+ *
+ */
+function theme_availability_calendar_formatter_default($element) {
+  if (!empty($element['#item']['from_date']) && !empty($element['#item']['to_date'])) {
+    return theme('availability_calendar_calendar', $element['#item']['from_date'], $element['#item']['to_date'], $element['#item']['status']);
+  }
+}
+
+/**
+ * FAPI theme for an individual element.
+ */
+function theme_availability_calendar($element) {
+  $output = '<div class="availability-calendar-date-widget">';
+  $output .= theme('textfield', $element['from_date']);
+  $output .= theme('textfield', $element['to_date']);
+  $output .= theme('select', $element['status']);
+  $output .= theme('button', $element['date_range_reset']);
+  $output .= '</div>';
+  return $output;
+}
 
 /**
  * Implementation of hook_field_info().
@@ -146,6 +184,10 @@ function availability_calendar_field_info() {
  */
 function availability_calendar_field_settings($op, $field) {
   switch ($op) {
+    case 'form':
+      $form = array();
+      return $form;
+    case 'save':
     case 'database columns':
       return array(
         'from_date' => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE, 'sortable' => FALSE, 'views' => FALSE),
@@ -176,35 +218,6 @@ function availability_calendar_field_formatter_info() {
       'multiple values' => CONTENT_HANDLE_CORE,
     ),
   );
-}
-
-/**
- * Theme function for 'default' example field formatter.
- *
- * $element['#item']: the sanitized $delta value for the item,
- * $element['#field_name']: the field name,
- * $element['#type_name']: the $node->type,
- * $element['#formatter']: the $formatter_name,
- * $element'#node']: the $node,
- * $element['#delta']: the delta of this item, like '0',
- *
- */
-function theme_availability_calendar_formatter_default($element) {
-  if (!empty($element['#item']['from_date']) && !empty($element['#item']['to_date'])) {
-    return theme('availability_calendar_calendar_default_format', $element['#item']['from_date'], $element['#item']['to_date'], $element['#item']['status']);
-  }
-}
-
-/**
- * FAPI theme for an individual element.
- */
-function theme_availability_calendar($element) {
-  $output = '<div class="availability-calendar-date-widget">';
-  $output .= theme('textfield', $element['from_date']);
-  $output .= theme('textfield', $element['to_date']);
-  $output .= theme('select', $element['status']);
-  $output .= '</div>';
-  return $output;
 }
 
 /**
@@ -301,7 +314,7 @@ function availability_calendar_widget(&$form, &$form_state, $field, $items, $del
  *
  * The $fields array is in $form['#field_info'][$element['#field_name']].
  */
-function availability_calendar_process($element, $edit, $form_state, $form) {
+function availability_calendar_process($element, $edit, &$form_state, $form) {
   //Load in necessary date_popup files or flag a warning if it does not exist.
   if (function_exists('date_popup_load')) {
     date_popup_load();
@@ -311,7 +324,7 @@ function availability_calendar_process($element, $edit, $form_state, $form) {
   //Load JS Files
   availabilityCalendar::_loadJS();
   //Form CSS
-  drupal_add_css(AVAILABILITY_CALENDAR_MODULE_PATH . '/css/form.css');
+  drupal_add_css(AVAILABILITY_CALENDAR_MODULE_PATH . '/css/availability-calendar-styles.css');
   //Date Widget Settings.
   $settings = array(
     'prevText'        => '&lt;'. date_t('Prev', 'date_nav'),
@@ -359,6 +372,16 @@ function availability_calendar_process($element, $edit, $form_state, $form) {
       'unavailable' => t('Unavailable'),
     ),
     '#attributes'   => array('class' => 'availability-calendar-status-field'),
+  );
+  //Reset Field.
+  $element['date_range_reset'] = array(
+    '#type'       => 'button',
+    '#value'      => t('Reset'),
+    '#weight'     => 101,
+    '#attributes' => array(
+      'class'   => 'availability-calendar-reset-field ',
+      'pickers' => $element['from_date']['#id'] .' ' .$element['to_date']['#id'],
+    ),
   );
   return $element;
 }

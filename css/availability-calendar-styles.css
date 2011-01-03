@@ -19,16 +19,29 @@ form#node-form input.availability-calendar-status-field {
   max-width:200px !important;
 }
 
+form#node-form div.availability-calendar-preview {
+  display:block;
+  width:100%;
+  clear:both;
+}
+
+form#node-form input.availability-calendar-reset-field {
+  margin-top:2%;
+  float:right;
+  clear:right;
+}
+
 /**
  * Calendar CSS
  */
+
 div.availability-calendar-month {
   margin:5px;
-  padding:10px 0 0 10px;
-  width:45%;
+  padding:10px 10px 0 10px;
+  width:46%;
   float:left;
   font-size:.7em;
-  height:200px;
+  min-height:225px;
   border: 1px solid #CCC;
 }
 

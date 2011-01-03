@@ -3,5 +3,6 @@ description    = Allows Users To create Flexible Availability Calendars with a C
 version        = 6.x-beta2
 dependencies[] = content
 dependencies[] = date_popup
+dependencies[] = jquery_ui
 package        = CCK
 core           = 6.x
