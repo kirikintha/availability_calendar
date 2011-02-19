@@ -38,6 +38,7 @@ NOTE: This will NEVER be legacy ported to Drupal 5, I am truly sorry, but I don'
 Content Module (CCK)
 Date Popup
 Jquery 1.2.6
+Jquery UI
 
 ##Road Map
 
