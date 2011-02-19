@@ -6,8 +6,8 @@ if (Drupal.jsEnabled) {
   //Make sure we have valid objects at all time
   Drupal.settings.availabilityCalendar = Drupal.settings.availabilityCalendar || {};
   Drupal.availabilityCalendar          = Drupal.availabilityCalendar || {};
-  //Document Ready
-  $(document).ready( function() {
+  //Bind page events.
+  Drupal.behaviors.availabilityCalendarInit = function(context) {
     //Update and rebind elements onLoad.
     //If we are on the node edit form, rebind elements
     if ($('div.availability-calendar-date-widget').length > 0 ) {
@@ -26,8 +26,7 @@ if (Drupal.jsEnabled) {
       //We are on a node view page, just update.
       Drupal.availabilityCalendar._updateCalendar();
     }
-  //end document ready
-  });
+  }
   //Rebind CCK elements when we add to multiple.
   Drupal.availabilityCalendar._rebindElements = function() {
     //Override the "reset" button so that it does not submit.
