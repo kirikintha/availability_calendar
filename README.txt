@@ -14,7 +14,7 @@ At the time your node loads, we take the output of your fields and create a java
 
 Jquery then runs this object against the rendered calendar, and then changes out the css classes, and thusly allows you to have a calendar with 'available' and 'unavailable' classes that you can play with. This is a nice way to not have a lot of extra logic for changing the availability of the calendar, and allows for more complex rendering from Developers.
 
-This module has been made to be fully theme-able, and you have a lot of control over the output. Please check the /theme file for the .t/l of your choice.
+This module has been made to be fully theme-able, and you have a lot of control over the output. Please check the /theme file for the .tpl of your choice.
 
 ##Notes on Compatibility
 This module has been tested with the latest release of Drupal, which is 6.17 and the latest version of the Content Module (CCK) 6.26. I can confirm this works on Drupal Core 6.14 and later, but please use the latest version of CCK so you don't run into trouble. I don't see why this wouldn't work with earlier versions of Drupal Core and CCK, but I am officially stating that I can only support you if you have an Up to Date site.
@@ -38,6 +38,7 @@ NOTE: This will NEVER be legacy ported to Drupal 5, I am truly sorry, but I don'
 Content Module (CCK)
 Date Popup
 Jquery 1.2.6
+Jquery UI
 
 ##Road Map
 
