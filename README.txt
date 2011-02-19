@@ -4,7 +4,7 @@ The Availability calendar Module adds a CCK widget named Availability Calendar: 
 
 You can use this on any content type. When you add this to your node, you will have a Preview Calendar, that automatically updates as you update your CCK field. Single, Multiple and Unlimited values are allowed.
 
-NOTE: You MUST enable the Availability Calendar: Calendar block on your node, or the Availability calendar will NOT display when you View your Node. This has also been tested with Panels, and should work accordingly. No extra configuration is necessary to view the availability calendar in the Node View.
+NOTE: You MUST enable the Availability Calendar: Calendar block on your node display, or the Availability calendar will NOT display when you View your Node. This has also been tested with Panels, and should work accordingly. No extra configuration is necessary to view the availability calendar in the Node Edit.
 
 RECOMMENDED: It is also Recommended that you use the Vertical Tabs Module, as this allows you to have a cleaner interface when viewing these complex and sometimes numerous entries in one field. My advice is to create a Field Group Named "Availability Calendar" and keep your availability date field in there.
 
